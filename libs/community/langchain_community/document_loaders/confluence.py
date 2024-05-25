@@ -156,6 +156,7 @@ class ConfluenceLoader(BaseLoader):
         number_of_retries: Optional[int] = 3,
         min_retry_seconds: Optional[int] = 2,
         max_retry_seconds: Optional[int] = 10,
+        custom_headers: Optional[dict] = None,
         confluence_kwargs: Optional[dict] = None,
         *,
         space_key: Optional[str] = None,
@@ -219,8 +220,14 @@ class ConfluenceLoader(BaseLoader):
                 url=url, oauth2=oauth2, cloud=cloud, **confluence_kwargs
             )
         elif token:
-            self.confluence = Confluence(
-                url=url, token=token, cloud=cloud, **confluence_kwargs
+            class CustomConfluence(Confluence):
+                def __init__(self, url, username, password, custom_headers=None, **kwargs):
+                    super().__init__(url, username, password, **kwargs)
+                    if custom_headers:
+                        self._session.headers.update(custom_headers)
+
+            self.confluence = CustomConfluence(
+                url=url, token=token, cloud=cloud, custom_headers=custom_headers, **confluence_kwargs
             )
         else:
             self.confluence = Confluence(
