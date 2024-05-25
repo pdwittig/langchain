@@ -31,6 +31,7 @@ class ContentFormat(str, Enum):
 
 
 class ConfluenceLoader(BaseLoader):
+    Print("phil")
     """Load `Confluence` pages.
 
     Port of https://llamahub.ai/l/confluence
